@@ -1,5 +1,5 @@
 <template>
-  <div class="sidebar_menu" :class="{ 'sidebar_menu--collapsed': collapsed }">
+  <div class="sidebar_menu">
     <div
       v-for="item in items"
       :key="item.key"
@@ -97,24 +97,6 @@ $primary-color: #2680eb;
       opacity 0.18s ease,
       max-width 0.28s ease,
       transform 0.28s ease;
-  }
-
-  &--collapsed {
-    .sidebar_menu__item {
-      justify-content: center;
-      gap: 0;
-      margin-left: 8px;
-      margin-right: 8px;
-      padding-left: 0;
-      padding-right: 0;
-    }
-
-    .sidebar_menu__title {
-      opacity: 0;
-      max-width: 0;
-      transform: translateX(-8px);
-      pointer-events: none;
-    }
   }
 }
 

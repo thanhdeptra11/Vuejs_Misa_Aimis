@@ -20,13 +20,6 @@ const props = defineProps({
 const emit = defineEmits(['search'])
 const keyword = ref('')
 let timeout = null
-
-watch(keyword, (newValue) => {
-  clearTimeout(timeout)
-  timeout = setTimeout(() => {
-    emit('search', newValue)
-  }, 400)
-})
 </script>
 <style lang="scss" scoped>
 $primary-color: #2680eb;

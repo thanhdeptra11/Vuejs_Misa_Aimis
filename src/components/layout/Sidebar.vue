@@ -1,5 +1,5 @@
 <template>
-  <div class="sidebar" :class="{ 'sidebar--collapsed': isCollapsed }" :style="sidebarStyle">
+  <div class="sidebar">
     <div class="sidebar_item_list">
       <div class="sidebar_content">
         <BaseSidebarMenu
@@ -11,8 +11,8 @@
       </div>
     </div>
     <button class="sidebar_toggle" type="button" @click="toggleSidebar">
-      <div class="sidebar_toggle_icon" :class="isCollapsed ? 'icon_right' : 'icon_left'"></div>
-      <span class="sidebar_toggle_text">{{ isCollapsed ? '' : 'Thu gọn' }}</span>
+      <div class="sidebar_toggle_icon"></div>
+      <span class="sidebar_toggle_text">Thu gọn</span>
     </button>
   </div>
 </template>
@@ -24,15 +24,6 @@ const EXPANDED_WIDTH = 233
 const COLLAPSED_WIDTH = 72
 
 const activeKey = ref('candidates')
-const isCollapsed = ref(false)
-
-const sidebarStyle = computed(() => ({
-  width: `${isCollapsed.value ? COLLAPSED_WIDTH : EXPANDED_WIDTH}px`,
-}))
-
-const toggleSidebar = () => {
-  isCollapsed.value = !isCollapsed.value
-}
 
 const handleSelect = (item) => {
   activeKey.value = item.key
@@ -160,25 +151,6 @@ const menuItems = [
         opacity 0.2s ease,
         transform 0.28s ease,
         margin 0.28s ease;
-    }
-  }
-
-  &--collapsed {
-    .sidebar_item_list {
-      padding-top: 20px;
-    }
-
-    .sidebar_toggle {
-      width: 48px;
-      left: 8px;
-      justify-content: center;
-    }
-
-    .sidebar_toggle_text {
-      margin-left: 0;
-      opacity: 0;
-      transform: translateX(-8px);
-      pointer-events: none;
     }
   }
 }
