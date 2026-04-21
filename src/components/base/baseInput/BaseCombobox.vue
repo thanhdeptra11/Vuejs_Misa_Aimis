@@ -4,11 +4,12 @@
       {{ label }} <span v-if="required" class="required">*</span>
     </label>
     
-    <div class="base-combobox-container" :class="{ 'focused': isOpen }">
+    <div class="base-combobox-container" :class="{ 'focused': isOpen, 'disabled': disabled }">
       <input
         type="text"
         class="base-combobox-input"
         :placeholder="placeholder"
+        :disabled="disabled"
         v-model="inputValue"
         @focus="openPopup"
         @input="handleInput"
@@ -64,6 +65,10 @@ const props = defineProps({
   placeholder: {
     type: String,
     default: 'Chọn giá trị'
+  },
+  disabled: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -99,10 +104,12 @@ const filteredOptions = computed(() => {
 })
 
 const openPopup = () => {
+  if (props.disabled) return
   isOpen.value = true
 }
 
 const togglePopup = () => {
+  if (props.disabled) return
   isOpen.value = !isOpen.value
 }
 
@@ -121,6 +128,7 @@ const closePopup = () => {
 }
 
 const handleInput = () => {
+  if (props.disabled) return
   isOpen.value = true
   highlightedValue.value = null
 }
@@ -180,6 +188,11 @@ onUnmounted(() => document.removeEventListener('mousedown', handleClickOutside))
   &.focused {
     border-color: $primary-blue;
   }
+  
+  &.disabled {
+    background-color: #f1f2f5;
+    border-color: #e0e0e0 !important;
+  }
 }
 
 .base-combobox-input {
@@ -196,6 +209,10 @@ onUnmounted(() => document.removeEventListener('mousedown', handleClickOutside))
   &::placeholder {
     color: #999;
   }
+  
+  &:disabled {
+    color: #999;
+  }
 }
 
 .base-combobox-btn {
@@ -205,6 +222,11 @@ onUnmounted(() => document.removeEventListener('mousedown', handleClickOutside))
   align-items: center;
   justify-content: center;
   cursor: pointer;
+}
+
+.disabled .base-combobox-btn {
+  cursor: not-allowed;
+  opacity: 0.5;
 }
 
 .icon_down {

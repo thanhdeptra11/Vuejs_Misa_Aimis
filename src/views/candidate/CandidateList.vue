@@ -5,14 +5,18 @@
       <ToolbarGrid @search="handleSearch" />
       <div class="candidate_list__grid_wrapper">
         <BaseGridData :columns="columns" :data="tableData" class="grid_data_area">
-          <!-- Slot để custom hiển thị cột fullName -->
-          <template #cell-fullName="{ value }">
+          <!-- Slot để custom hiển thị cột candidateName -->
+          <template #cell-candidateName="{ value }">
             <div class="avatar_cell">
               <div class="avatar_circle" :style="getAvatarStyle(value)">
                 {{ getInitials(value) }}
               </div>
               <span class="user_name" :title="value">{{ value }}</span>
             </div>
+          </template>
+
+          <template #cell-candidateDob="{ value }">
+            <span>{{ formatDate(value) }}</span>
           </template>
         </BaseGridData>
         <GridDataFooter
@@ -28,6 +32,7 @@
        v-model="showAddModal" 
        :title="modalTitle" 
        @closeModal="showAddModal = false"
+       @saved="fetchCandidates"
     />
   </div>
 </template>
@@ -38,19 +43,19 @@ import ToolbarGrid from '@/components/candidatesComponents/ToolbarGrid.vue'
 import BaseGridData from '@/components/base/baseGridData/GridData.vue'
 import GridDataFooter from '@/components/base/baseGridData/GridDataFooter.vue'
 import ManipulateCandidateDataModal from '@/components/candidatesComponents/ManipulateCandidateDataModal.vue'
-import { candidateService } from '@/services/candidateService'
+import candidatesService from '@/services/candidatesService'
 
 const columns = [
-  { key: 1, field: 'fullName', title: 'Họ và tên', width: '245px' },
-  { key: 2, field: 'dob', title: 'Ngày sinh', width: '110px' },
-  { key: 3, field: 'gender', title: 'Giới tính', width: '100px' },
-  { key: 4, field: 'region', title: 'Khu vực', width: '150px' },
-  { key: 5, field: 'phone', title: 'Số điện thoại', width: '150px' },
-  { key: 6, field: 'email', title: 'Email', width: '200px' },
-  { key: 7, field: 'country', title: 'Quốc gia', width: '150px' },
-  { key: 8, field: 'city', title: 'Thành phố', width: '150px' },
-  { key: 9, field: 'ward', title: 'Phường/Xã', width: '150px' },
-  { key: 10, field: 'address', title: 'Địa chỉ', width: '200px' },
+  { key: 1, field: 'candidateName', title: 'Họ và tên', width: '245px' },
+  { key: 2, field: 'candidateDob', title: 'Ngày sinh', width: '160px' },
+  { key: 3, field: 'candidateGender', title: 'Giới tính', width: '100px' },
+  { key: 4, field: 'candidateRegion', title: 'Khu vực', width: '150px' },
+  { key: 5, field: 'candidatePhoneNumber', title: 'Số điện thoại', width: '150px' },
+  { key: 6, field: 'candidateEmail', title: 'Email', width: '200px' },
+  { key: 7, field: 'candidateCountry', title: 'Quốc gia', width: '150px' },
+  { key: 8, field: 'candidateProvince', title: 'Thành phố', width: '150px' },
+  { key: 9, field: 'candidateWard', title: 'Phường/Xã', width: '150px' },
+  { key: 10, field: 'candidateAddressDetail', title: 'Địa chỉ', width: '200px' },
 ]
 
 const currentPage = ref(1)
@@ -68,20 +73,36 @@ const openAddModal = () => {
   showAddModal.value = true
 }
 
-const fetchCandidates = () => {
-  const result = candidateService.getPaginated(
-    currentPage.value,
-    pageSize.value,
-    searchKeyword.value
-  )
-  tableData.value = result.data
-  totalRecords.value = result.totalRecords
+const fetchCandidates = async () => {
+  const request = {
+    pageNumber: currentPage.value,
+    pageSize: pageSize.value,
+    searchTerm: searchKeyword.value
+  }
+  try {
+    const res = await candidatesService.getPaging(request)
+    tableData.value = res.data || res.Data || res.items || res
+    totalRecords.value = res.totalRecords || res.TotalRecords || res.totalCount || 0
+  } catch (error) {
+    console.error('Failed to fetch candidates:', error)
+  }
 }
 
 const handleSearch = (keyword) => {
   searchKeyword.value = keyword
   currentPage.value = 1
 }
+
+const formatDate = (dateStr) => {
+  if (!dateStr) return ''
+  const date = new Date(dateStr)
+  if (isNaN(date.getTime())) return dateStr
+  const day = String(date.getDate()).padStart(2, '0')
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const year = date.getFullYear()
+  return `${day}/${month}/${year}`
+}
+
 // Logic tạo avatar tạm
 
 const getInitials = (name) => {

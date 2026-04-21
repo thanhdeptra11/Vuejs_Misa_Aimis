@@ -112,12 +112,14 @@
                 placeholder="Chọn tỉnh/thành phố"
                 v-model="candidateCity"
                 :options="cityOptions"
+                :disabled="!candidateCountry"
               />
           <BaseCombobox 
                 label="Phường/Xã"
                 placeholder="Chọn phường/xã"
                 v-model="candidateWard"
                 :options="wardOptions"
+                :disabled="!candidateCity"
               />
           <BaseInput 
             label="Địa chỉ" 
@@ -139,30 +141,90 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import ModalBasis from '@/components/base/baseModal/ModalBasis.vue'
+import candidatesService from '@/services/candidatesService'
+import regionService from '@/services/regionService'
 
 const props = defineProps({
   modelValue: { type: Boolean, default: false },
   title: { type: String, default: 'Thêm ứng viên' }
 })
 
-const emit = defineEmits(['update:modelValue', 'closeModal'])
+const emit = defineEmits(['update:modelValue', 'closeModal', 'saved'])
 
 // Quản lý dữ liệu người dùng
 const candidateName = ref('')
 const candidateDOB = ref('') // Store chuỗi string trả về từ DatePicker
 const candidateGender = ref('')
 const candidateRegion = ref('')
+const candidateCountry = ref('')
+const candidateCity = ref('')
+const candidateWard = ref('')
+const candidateAddressDetail = ref('')
 const candidatePhone = ref('')
 const candidateEmail = ref('')
-const candidateAddressDetail = ref('')
+
 
 const genderOptions = [
   { label: 'Nam', value: 1 },
   { label: 'Nữ', value: 0 },
   { label: 'Khác', value: 2 }
 ]
+
+const countryOptions = ref([])
+const cityOptions = ref([])
+const wardOptions = ref([])
+
+onMounted(async () => {
+  countryOptions.value = await fetchRegions(null)
+})
+
+const fetchRegions = async (parentId) => {
+  try {
+    const filters = []
+    if (parentId) {
+      filters.push({ property: 'ParentId', operator: '=', value: parentId })
+    } else {
+      // Dùng '=' và giá trị null thay vì 'IS NULL'
+      filters.push({ property: 'ParentId', operator: '=', value: null })
+    }
+    const res = await regionService.getPaging({
+      pageNumber: 1,
+      pageSize: 1000,
+      searchTerm: '',
+      filters
+    })
+    const items = res.data || res.Data || res.items || res || []
+    return items.map(x => ({ label: x.regionName || x.name || x.label, value: x.id || x.value }))
+  } catch (error) {
+    console.error('Failed to fetch regions:', error)
+    return []
+  }
+}
+
+// Logic load Tỉnh thao Quốc gia
+watch(candidateCountry, async (newVal) => {
+  candidateCity.value = ''
+  candidateWard.value = ''
+  
+  if (newVal) {
+    cityOptions.value = await fetchRegions(newVal)
+  } else {
+    cityOptions.value = []
+  }
+})
+
+// Logic load Xã theo Tỉnh
+watch(candidateCity, async (newVal) => {
+  candidateWard.value = ''
+  
+  if (newVal) {
+    wardOptions.value = await fetchRegions(newVal)
+  } else {
+    wardOptions.value = []
+  }
+})
 
 // Quản lý trạng thái File Upload
 const fileInput = ref(null)
@@ -174,8 +236,27 @@ const handleClose = () => {
   emit('closeModal')
 }
 
-const save = () => {
-  handleClose()
+const save = async () => {
+  const payload = {
+    candidateName: candidateName.value,
+    candidateDob: candidateDOB.value || null,
+    candidateGender: candidateGender.value,
+    candidatePhoneNumber: candidatePhone.value,
+    candidateEmail: candidateEmail.value,
+    candidateRegion: candidateRegion.value,
+    candidateCountry: candidateCountry.value,
+    candidateProvince: candidateCity.value,
+    candidateWard: candidateWard.value,
+    candidateAddressDetail: candidateAddressDetail.value
+  }
+
+  try {
+    await candidatesService.create(payload)
+    emit('saved')
+    handleClose()
+  } catch (error) {
+    console.error('Failed to create candidate:', error)
+  }
 }
 
 // Logic định dạng dung lượng file
