@@ -32,8 +32,8 @@
             </slot>
           </td>
           <td class="action_row">
-            <OnlyIconButton icon-class="icon_edit_table" @click="$emit('editRowTable', row)" />
-            <OnlyIconButton icon-class="icon_delete_table" @click="$emit('deleteRowTable', row)" />
+            <OnlyIconButton class="icon icon_edit_table" @click="$emit('editRowTable', row)" />
+            <OnlyIconButton class="icon icon_delete_table" @click="$emit('deleteRowTable', row)" />
           </td>
         </tr>
         <!-- Nơi hiển thị khi không có dữ liệu -->
@@ -174,5 +174,13 @@ defineProps({
   justify-content: start;
   align-items: center;
   gap: 15px;
+  opacity: 1;
+}
+.action_row .icon{
+  opacity: 0;
+}
+.table_row:hover .icon{
+  opacity: 1;
+  transition: opacity 0.3s ease-in-out;
 }
 </style>
