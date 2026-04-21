@@ -9,11 +9,11 @@
       >
         <div 
           class="modal-container" 
-          :style="{ width: width, height: height }" 
+          :style="{ width: width, maxHeight: maxHeight }" 
           @mousedown.stop
         >
           <div class="modal-header">
-            <h3 class="modal-title">{{ title }}</h3>
+            <span class="modal-title">{{ title }}</span>
             <div class="close-btn icon_close" @click="closeModal">
              
             </div>
@@ -39,7 +39,7 @@ const props = defineProps({
   modelValue: { type: Boolean, default: false },
   title: { type: String, default: '' },
   width: { type: String, default: '600px' },
-  height: { type: String, default: 'auto' },
+  maxHeight: { type: String, default: '90vh' },
   overlayBg: { type: String, default: 'rgba(0, 0, 0, 0.45)' },
   closeOnOverlayClick: { type: Boolean, default: false }
 })
@@ -83,20 +83,20 @@ watch(() => props.modelValue, (val) => {
   display: flex;
   flex-direction: column;
   max-height: 90vh; /* Ngăn Modal quá dài so với màn hình */
+  flex-shrink: 0;
+  
 }
 
 .modal-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  padding: 16px 24px;
+  margin: 24px 16px 0 24px;
 }
 
 .modal-title {
-  font-size: 20px;
+  font-size: 24px;
   font-weight: 700;
-  color: #111;
-  margin: 0;
+  color: #000000;
 }
 
 .close-btn {
@@ -114,15 +114,23 @@ watch(() => props.modelValue, (val) => {
 .modal-body {
   flex: 1;
   overflow-y: auto;
-  padding: 0 24px 24px 24px;
+  scrollbar-gutter: stable;
+  padding: 24px !important;
 }
 
 .modal-footer {
-  padding: 16px 24px;
+  height: 56px;
+  padding: 9px 24px;
   display: flex;
   justify-content: flex-end;
+  align-items: center;
   gap: 12px;
-  border-top: 1px solid #e0e0e0;
+  border-top: 1px solid #dddde4;
+  background-color: #f1f2f5;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  border-bottom-left-radius: 6px;
+  border-bottom-right-radius: 6px;
 }
 
 /* Hiệu ứng Transition cho Overlay mờ dần và Modal trượt */

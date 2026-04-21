@@ -328,3 +328,11 @@
   -webkit-mask-repeat: no-repeat;
   background-color: #666666;
 }
+
+.icon_pdf {
+  width: 61px;
+  height: 48px;
+  background-image: url("https://amisplatform.misacdn.net/apps/recruit2/assets/images/ICON.svg");
+  background-position: -1px -228px;
+  background-repeat: no-repeat;
+}

@@ -1,5 +1,5 @@
 <template>
-  <div class="base_select_box" ref="wrapperRef" tabindex="0" @blur="closePopup">
+  <div class="base_select_box" :class="`base_select_box--${variant}`" ref="wrapperRef" tabindex="0" @blur="closePopup">
     <div class="base_select_box__display" @click="togglePopup">
       <span class="base_select_box__text">{{ currentLabel }}</span>
       <div class="icon_down" :class="{ 'rotate-180': isOpen }"></div>
@@ -7,9 +7,6 @@
     
     <Transition name="fade-slide">
       <ul class="base_select_box__dropdown shadow-box" v-if="isOpen" @mousedown.prevent>
-        <!-- 1: Thêm class động cho li
-         2: Gọi hàm khi select stop ngăn event lan lên cha
-         3: Rê chuột highlight option -->
         <li 
           v-for="opt in options" 
           :key="opt.value" 
@@ -36,6 +33,10 @@ const props = defineProps({
   options: {
     type: Array,
     default: () => []
+  },
+  variant: {
+    type: String,
+    default: 'default'
   }
 })
 
@@ -80,20 +81,21 @@ onUnmounted(() => document.removeEventListener('mousedown', handleClickOutside))
   user-select: none;
   font-family: inherit;
   outline: none;
+  cursor: pointer;
+}
+.base_select_box--default {
   border: 1px solid #e0e0e0;
-  border-radius: 4px;
   background-color: #fff;
   height: 32px;
   width: 70px;
-  cursor: pointer;
+  border-radius: 4px;
 }
-.base_select_box__display:hover {
-  border-color: #2a7efc;
+.base_select_box--borderless {
+  border: none;
+  background-color: transparent;
+  width: auto;
+  height: auto;
 }
-.base_select_box__display:hover .base_select_box__text{
-  color: #2a7efc;
-}
-
 .base_select_box__display {
   display: flex;
   align-items: center;
@@ -102,9 +104,25 @@ onUnmounted(() => document.removeEventListener('mousedown', handleClickOutside))
   font-size: 14px;
   font-weight: 400;
   height: 100%;
-  padding: 0 8px;
+  padding: 0 4px;
 }
 
+.base_select_box--borderless .base_select_box__display {
+  color: #7a8188;
+  font-size: 13px;
+  padding: 0;
+  gap: 4px;
+}
+
+.base_select_box--borderless .base_select_box__display:hover .base_select_box__text {
+  color: #214bf5;
+}
+.base_select_box--default:hover {
+  border-color: #2a7efc;
+}
+.base_select_box--default:hover .base_select_box__text{
+  color: #2a7efc;
+}
 
 .icon_down.rotate-180 {
   transform: rotate(180deg);

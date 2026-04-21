@@ -37,7 +37,7 @@ import Header from '@/components/candidatesComponents/Header.vue'
 import ToolbarGrid from '@/components/candidatesComponents/ToolbarGrid.vue'
 import BaseGridData from '@/components/base/baseGridData/GridData.vue'
 import GridDataFooter from '@/components/base/baseGridData/GridDataFooter.vue'
-import ManipulateCandidateDataModal from '@/components/base/baseModal/ManipulateCandidateDataModal.vue'
+import ManipulateCandidateDataModal from '@/components/candidatesComponents/ManipulateCandidateDataModal.vue'
 import { candidateService } from '@/services/candidateService'
 
 const columns = [
