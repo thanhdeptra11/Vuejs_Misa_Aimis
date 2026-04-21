@@ -15,8 +15,10 @@
 
     <!-- Phần Footer -->
     <template class="footer" #footer>
-      <button class="base-btn btn-secondary" @click="handleClose">Hủy</button>
-      <button class="base-btn btn-primary" @click="save">Lưu</button>
+      <span  @click="handleClose">Hủy</span>
+      <BaseButton variant="secondary" 
+      buttonText="Lưu" 
+      @click="save"></BaseButton>
     </template>
   </ModalBasis>
 </template>
@@ -50,6 +52,12 @@ const save = () => {
   border-top: 1px solid #dddde4;
   background-color: #f1f2f5 !important;
 }
+span{
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  
+}
 .placeholder-content {
   padding: 40px 20px;
   text-align: center;
@@ -58,30 +66,5 @@ const save = () => {
   font-size: 14px;
 }
 
-/* Các nút bấm ở Footer */
-.base-btn {
-  height: 36px;
-  padding: 0 20px;
-  border-radius: 4px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  border: none;
-  transition: all 0.2s;
-}
-.btn-secondary {
-  background-color: #fff;
-  border: 1px solid #e0e0e0;
-  color: #333;
-}
-.btn-secondary:hover {
-  background-color: #f1f1f1;
-}
-.btn-primary {
-  background-color: #214bf5;
-  color: #fff;
-}
-.btn-primary:hover {
-  background-color: #2a7efc;
-}
+
 </style>

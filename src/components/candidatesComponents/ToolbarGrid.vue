@@ -9,21 +9,21 @@
     </div>
     <div class="toolbar_grid__right">
       <!-- Các nút chức năng khác có thể được thêm vào đây -->
-      <IconButton title="Bộ lọc" iconClass="icon_filter" @click="console.log('Lọc dữ liệu')" />
-      <IconButton title="Xuất khẩu" iconClass="icon_export" @click="console.log('Xuất dữ liệu')" />
-      <IconButton
+      <BaseButton variant="icon" title="Bộ lọc" iconClass="icon_filter" @click="console.log('Lọc dữ liệu')" />
+      <BaseButton variant="icon" title="Xuất khẩu" iconClass="icon_export" @click="console.log('Xuất dữ liệu')" />
+      <BaseButton
+        variant="icon"
         title="Xem nhanh hoạt động"
         iconClass="icon_interactive_history"
         @click="console.log('Xem lịch sử hoạt động')"
       />
-      <IconButton iconClass="icon_setting_column" @click="console.log('Tùy chỉnh cột hiển thị')" />
+      <BaseButton variant="icon" iconClass="icon_setting_column" @click="console.log('Tùy chỉnh cột hiển thị')" />
     </div>
   </div>
 </template>
 <script setup>
 import BaseSearchBox from '../base/BaseSearchBox.vue'
 import AiHelpButton from '../base/baseButton/AiHelpButton.vue'
-import IconButton from '../base/baseButton/IconButton.vue'
 const emit = defineEmits(['search'])
 
 const handleAiHelpClick = () => {

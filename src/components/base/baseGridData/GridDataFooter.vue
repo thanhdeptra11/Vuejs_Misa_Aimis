@@ -34,7 +34,6 @@
 
 <script setup>
 import { computed, ref, watch } from 'vue'
-import BaseSelectBox from '../baseInput/BaseSelectBox.vue'
 
 const props = defineProps({
   totalRecords: { type: Number, default: 0 },

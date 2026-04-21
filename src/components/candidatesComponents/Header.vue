@@ -2,20 +2,23 @@
   <div class="header">
     <span class="header_title">Ứng viên</span>
     <div class="header_right">
-      <PrimaryButton
+      <BaseButton
+        variant="primary"
         iconClass="icon_delete_candidate"
         buttonText="Xóa dữ liệu ứng viên không trúng tuyển"
         @click="handleDeleteCandidate"
       />
       <div class="header_right__double_button">
-        <SecondaryButton
+        <BaseButton
+          variant="secondary"
           class="header_right__double_button__btnAdd"
           iconClass="icon_add"
           buttonText="Thêm ứng viên"
           @click="addCandidate"
         >
-        </SecondaryButton>
-        <SecondaryButton
+        </BaseButton>
+        <BaseButton
+          variant="secondary"
           class="header_right__double_button__btnDown"
           iconClass="icon_down"
           buttonText=""
@@ -26,8 +29,6 @@
   </div>
 </template>
 <script setup>
-import PrimaryButton from '../base/baseButton/PrimaryButton.vue'
-import SecondaryButton from '../base/baseButton/SecondaryButton.vue'
 const emit = defineEmits(['add-candidate'])
 
 const handleDeleteCandidate = () => {

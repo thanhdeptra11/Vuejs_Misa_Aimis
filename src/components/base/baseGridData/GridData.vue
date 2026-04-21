@@ -32,8 +32,8 @@
             </slot>
           </td>
           <td class="action_row">
-            <OnlyIconButton class="icon icon_edit_table" @click="$emit('editRowTable', row)" />
-            <OnlyIconButton class="icon icon_delete_table" @click="$emit('deleteRowTable', row)" />
+            <BaseButton variant="icon-only" class="icon icon_edit_table" @click="$emit('editRowTable', row)" />
+            <BaseButton variant="icon-only" class="icon icon_delete_table" @click="$emit('deleteRowTable', row)" />
           </td>
         </tr>
         <!-- Nơi hiển thị khi không có dữ liệu -->
@@ -46,7 +46,6 @@
 </template>
 
 <script setup>
-import OnlyIconButton from '../baseButton/OnlyIconButton.vue'
 
 defineProps({
   columns: {
