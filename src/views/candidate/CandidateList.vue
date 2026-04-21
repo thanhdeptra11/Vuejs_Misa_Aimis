@@ -4,7 +4,17 @@
     <div class="candidate_list__content">
       <ToolbarGrid @search="handleSearch" />
       <div class="candidate_list__grid_wrapper">
-        <BaseGridData :columns="columns" :data="tableData" class="grid_data_area" />
+        <BaseGridData :columns="columns" :data="tableData" class="grid_data_area">
+          <!-- Slot để custom hiển thị cột fullName -->
+          <template #cell-fullName="{ value }">
+            <div class="avatar_cell">
+              <div class="avatar_circle" :style="getAvatarStyle(value)">
+                {{ getInitials(value) }}
+              </div>
+              <span class="user_name" :title="value">{{ value }}</span>
+            </div>
+          </template>
+        </BaseGridData>
         <GridDataFooter
           :totalRecords="totalRecords"
           v-model:currentPage="currentPage"
@@ -72,6 +82,27 @@ const handleSearch = (keyword) => {
   searchKeyword.value = keyword
   currentPage.value = 1
 }
+// Logic tạo avatar tạm
+
+const getInitials = (name) => {
+  if (!name) return ''
+  const words = name.trim().split(/\s+/)
+  if (words.length === 1) return words[0].charAt(0).toUpperCase()
+  return (words[0].charAt(0) + words[words.length - 1].charAt(0)).toUpperCase()
+}
+
+const avatarColors = ['#498af2', '#de5bea', '#7966f2', '#1fac54', '#f19e38', '#e35656', '#26c1a8']
+
+const getAvatarStyle = (name) => {
+  if (!name) return { backgroundColor: '#ccc' }
+  // Dùng mã ASCII của tên để chọn màu ổn định
+  let sum = 0
+  for (let i = 0; i < name.length; i++) {
+    sum += name.charCodeAt(i)
+  }
+  const color = avatarColors[sum % avatarColors.length]
+  return { backgroundColor: color }
+}
 
 watch([currentPage, pageSize, searchKeyword], fetchCandidates, {
   immediate: true,
@@ -108,6 +139,29 @@ watch([currentPage, pageSize, searchKeyword], fetchCandidates, {
   .grid_data_area {
     flex: 1; /* Để table lăn tự do, phần footer vẫn nằm ngang đáy */
     min-height: 0;
+  }
+
+  .avatar_cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .avatar_circle {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 500;
+    flex-shrink: 0;
+  }
+  .user_name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
 </style>

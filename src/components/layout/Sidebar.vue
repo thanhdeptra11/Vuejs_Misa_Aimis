@@ -1,5 +1,5 @@
 <template>
-  <div class="sidebar">
+  <div class="sidebar" :class="{ 'sidebar--collapsed': isCollapsed }" :style="sidebarStyle">
     <div class="sidebar_item_list">
       <div class="sidebar_content">
         <BaseSidebarMenu
@@ -11,8 +11,8 @@
       </div>
     </div>
     <button class="sidebar_toggle" type="button" @click="toggleSidebar">
-      <div class="sidebar_toggle_icon"></div>
-      <span class="sidebar_toggle_text">Thu gọn</span>
+      <div class="sidebar_toggle_icon" :class="isCollapsed ? 'icon_right' : 'icon_left'"></div>
+      <span class="sidebar_toggle_text">{{ isCollapsed ? '' : 'Thu gọn' }}</span>
     </button>
   </div>
 </template>
@@ -24,6 +24,15 @@ const EXPANDED_WIDTH = 233
 const COLLAPSED_WIDTH = 72
 
 const activeKey = ref('candidates')
+const isCollapsed = ref(false)
+// Tính toán chiều rộng của sidebar
+const sidebarStyle = computed(() => ({
+  width: `${isCollapsed.value ? COLLAPSED_WIDTH : EXPANDED_WIDTH}px`,
+}))
+
+const toggleSidebar = () => {
+  isCollapsed.value = !isCollapsed.value
+}
 
 const handleSelect = (item) => {
   activeKey.value = item.key
@@ -87,7 +96,7 @@ const menuItems = [
   position: relative;
   background-color: rgba(0, 0, 0, 0.6509803922);
   backdrop-filter: blur(14px);
-  background-image: url(https://amisplatform.misacdn.net/apps/recruit2/event-sidebar.b836f9e63b28d1c0.png);
+  background-image: url(https://amisplatform.misacdn.net/apps/recruit2/assets/images/sidebar-bg/event-sidebar.png);
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
@@ -151,6 +160,21 @@ const menuItems = [
         opacity 0.2s ease,
         transform 0.28s ease,
         margin 0.28s ease;
+    }
+  }
+
+  &--collapsed {
+ 
+    .sidebar_toggle {
+      width: 48px;
+      left: 8px;
+      justify-content: center;
+    }
+
+    .sidebar_toggle_text {
+      margin-left: 0;
+      opacity: 0;
+      pointer-events: none;
     }
   }
 }
