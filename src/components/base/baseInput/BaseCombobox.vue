@@ -21,7 +21,7 @@
       
       <!-- Dropdown Popup -->
       <Transition name="fade-slide">
-        <ul v-if="isOpen" class="base-combobox-dropdown shadow-box">
+        <ul v-if="isOpen" class="base-combobox-dropdown shadow-box" @scroll="handleScroll">
           <li v-if="filteredOptions.length === 0" class="base-combobox-empty">
             Không có dữ liệu để hiển thị
           </li>
@@ -72,7 +72,7 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue', 'load-more'])
 
 const wrapperRef = ref(null)
 const isOpen = ref(false)
@@ -105,11 +105,17 @@ const filteredOptions = computed(() => {
 
 const openPopup = () => {
   if (props.disabled) return
-  isOpen.value = true
+  if (!isOpen.value) {
+    window.dispatchEvent(new CustomEvent('close-all-comboboxes'))
+    isOpen.value = true
+  }
 }
 
 const togglePopup = () => {
   if (props.disabled) return
+  if (!isOpen.value) {
+    window.dispatchEvent(new CustomEvent('close-all-comboboxes'))
+  }
   isOpen.value = !isOpen.value
 }
 
@@ -129,6 +135,9 @@ const closePopup = () => {
 
 const handleInput = () => {
   if (props.disabled) return
+  if (!isOpen.value) {
+    window.dispatchEvent(new CustomEvent('close-all-comboboxes'))
+  }
   isOpen.value = true
   highlightedValue.value = null
 }
@@ -145,8 +154,25 @@ const handleClickOutside = (e) => {
   }
 }
 
-onMounted(() => document.addEventListener('mousedown', handleClickOutside))
-onUnmounted(() => document.removeEventListener('mousedown', handleClickOutside))
+const handleScroll = (e) => {
+  const target = e.target
+  if (target.scrollTop + target.clientHeight >= target.scrollHeight - 5) {
+    emit('load-more')
+  }
+}
+
+const closeComboboxEvent = () => {
+  if (isOpen.value) isOpen.value = false
+}
+
+onMounted(() => {
+  document.addEventListener('mousedown', handleClickOutside)
+  window.addEventListener('close-all-comboboxes', closeComboboxEvent)
+})
+onUnmounted(() => {
+  document.removeEventListener('mousedown', handleClickOutside)
+  window.removeEventListener('close-all-comboboxes', closeComboboxEvent)
+})
 </script>
 
 <style lang="scss" scoped>
@@ -249,6 +275,9 @@ onUnmounted(() => document.removeEventListener('mousedown', handleClickOutside))
   border-radius: 4px;
   list-style: none;
   z-index: 1000;
+  /* Kích hoạt thanh cuộn */
+  max-height: 250px;
+  overflow-y: auto;
 }
 .shadow-box {
   box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.1);

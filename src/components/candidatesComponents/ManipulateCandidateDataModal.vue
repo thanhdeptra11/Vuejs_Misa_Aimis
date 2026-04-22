@@ -105,21 +105,24 @@
                 label="Quốc gia"
                 placeholder="Chọn quốc gia"
                 v-model="candidateCountry"
-                :options="countryOptions"
+                :options="countryData.options"
+                @load-more="loadCountries"
               />
           <BaseCombobox 
                 label="Tỉnh/Thành phố"
                 placeholder="Chọn tỉnh/thành phố"
                 v-model="candidateCity"
-                :options="cityOptions"
+                :options="cityData.options"
                 :disabled="!candidateCountry"
+                @load-more="loadCities"
               />
           <BaseCombobox 
                 label="Phường/Xã"
                 placeholder="Chọn phường/xã"
                 v-model="candidateWard"
-                :options="wardOptions"
+                :options="wardData.options"
                 :disabled="!candidateCity"
+                @load-more="loadWards"
               />
           <BaseInput 
             label="Địa chỉ" 
@@ -141,7 +144,7 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted } from 'vue'
+import { ref, reactive, watch, onMounted } from 'vue'
 import ModalBasis from '@/components/base/baseModal/ModalBasis.vue'
 import candidatesService from '@/services/candidatesService'
 import regionService from '@/services/regionService'
@@ -167,39 +170,54 @@ const candidateEmail = ref('')
 
 
 const genderOptions = [
-  { label: 'Nam', value: 1 },
-  { label: 'Nữ', value: 0 },
-  { label: 'Khác', value: 2 }
+  { label: 'Nam', value: 'Nam' },
+  { label: 'Nữ', value: 'Nữ' },
+  { label: 'Khác', value: 'Khác' }
 ]
 
-const countryOptions = ref([])
-const cityOptions = ref([])
-const wardOptions = ref([])
+const countryData = reactive({ options: [], page: 1, hasMore: true, isLoading: false })
+const cityData = reactive({ options: [], page: 1, hasMore: true, isLoading: false })
+const wardData = reactive({ options: [], page: 1, hasMore: true, isLoading: false })
 
-onMounted(async () => {
-  countryOptions.value = await fetchRegions(null)
+const loadCountries = () => fetchRegions(null, countryData)
+const loadCities = () => fetchRegions(candidateCountry.value, cityData)
+const loadWards = () => fetchRegions(candidateCity.value, wardData)
+
+onMounted(() => {
+  loadCountries()
 })
 
-const fetchRegions = async (parentId) => {
+const fetchRegions = async (parentId, dataState) => {
+  if (!dataState.hasMore || dataState.isLoading) return
+  dataState.isLoading = true
+
   try {
     const filters = []
     if (parentId) {
       filters.push({ property: 'ParentId', operator: '=', value: parentId })
     } else {
-      // Dùng '=' và giá trị null thay vì 'IS NULL'
-      filters.push({ property: 'ParentId', operator: '=', value: null })
+      filters.push({ property: 'RegionLevel', operator: '=', value: 1 })
     }
     const res = await regionService.getPaging({
-      pageNumber: 1,
-      pageSize: 1000,
+      pageNumber: dataState.page,
+      pageSize: 20,
       searchTerm: '',
       filters
     })
     const items = res.data || res.Data || res.items || res || []
-    return items.map(x => ({ label: x.regionName || x.name || x.label, value: x.id || x.value }))
+    const newOptions = items.map(x => ({ label: x.regionName || x.name || x.label, value: x.id || x.value }))
+    
+    dataState.options.push(...newOptions)
+
+    if (newOptions.length < 20) {
+      dataState.hasMore = false
+    } else {
+      dataState.page++
+    }
   } catch (error) {
     console.error('Failed to fetch regions:', error)
-    return []
+  } finally {
+    dataState.isLoading = false
   }
 }
 
@@ -207,22 +225,21 @@ const fetchRegions = async (parentId) => {
 watch(candidateCountry, async (newVal) => {
   candidateCity.value = ''
   candidateWard.value = ''
+  Object.assign(cityData, { options: [], page: 1, hasMore: true, isLoading: false })
+  Object.assign(wardData, { options: [], page: 1, hasMore: true, isLoading: false })
   
   if (newVal) {
-    cityOptions.value = await fetchRegions(newVal)
-  } else {
-    cityOptions.value = []
+    await loadCities()
   }
 })
 
 // Logic load Xã theo Tỉnh
 watch(candidateCity, async (newVal) => {
   candidateWard.value = ''
+  Object.assign(wardData, { options: [], page: 1, hasMore: true, isLoading: false })
   
   if (newVal) {
-    wardOptions.value = await fetchRegions(newVal)
-  } else {
-    wardOptions.value = []
+    await loadWards()
   }
 })
 
@@ -236,10 +253,24 @@ const handleClose = () => {
   emit('closeModal')
 }
 
+const parseDobForBackend = (dobStr) => {
+  if (!dobStr) return null;
+  const parts = String(dobStr).trim().split('/');
+  
+  if (parts.length === 3) { // dd/MM/yyyy
+    return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}T00:00:00`;
+  } else if (parts.length === 2) { // MM/yyyy
+    return `${parts[1]}-${parts[0].padStart(2, '0')}-01T00:00:00`;
+  } else if (parts.length === 1 && parts[0].length === 4) { // yyyy
+    return `${parts[0]}-01-01T00:00:00`;
+  }
+  return null;
+}
+
 const save = async () => {
   const payload = {
     candidateName: candidateName.value,
-    candidateDob: candidateDOB.value || null,
+    candidateDob: parseDobForBackend(candidateDOB.value),
     candidateGender: candidateGender.value,
     candidatePhoneNumber: candidatePhone.value,
     candidateEmail: candidateEmail.value,

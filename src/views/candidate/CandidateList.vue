@@ -52,9 +52,9 @@ const columns = [
   { key: 4, field: 'candidateRegion', title: 'Khu vực', width: '150px' },
   { key: 5, field: 'candidatePhoneNumber', title: 'Số điện thoại', width: '150px' },
   { key: 6, field: 'candidateEmail', title: 'Email', width: '200px' },
-  { key: 7, field: 'candidateCountry', title: 'Quốc gia', width: '150px' },
-  { key: 8, field: 'candidateProvince', title: 'Thành phố', width: '150px' },
-  { key: 9, field: 'candidateWard', title: 'Phường/Xã', width: '150px' },
+  { key: 7, field: 'candidateCountryName', title: 'Quốc gia', width: '150px' },
+  { key: 8, field: 'candidateProvinceName', title: 'Thành phố', width: '200px' },
+  { key: 9, field: 'candidateWardName', title: 'Phường/Xã', width: '200px' },
   { key: 10, field: 'candidateAddressDetail', title: 'Địa chỉ', width: '200px' },
 ]
 
